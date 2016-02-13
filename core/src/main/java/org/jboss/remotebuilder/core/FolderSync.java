@@ -25,10 +25,12 @@ public class FolderSync {
 
     private static final String UPLOAD_PATH = "servlet/upload";
     private final URI baseServerUri;
-    private final Path localRoot = Paths.get(".");
+    private final String remoteRootPath;
+    private final Path localRoot = Paths.get(".").toAbsolutePath();
 
-    public FolderSync(URI baseServerUri) {
+    public FolderSync(URI baseServerUri, String remoteRootPath) {
         this.baseServerUri = baseServerUri;
+        this.remoteRootPath = remoteRootPath;
     }
 
     public void push() throws IOException {
@@ -37,7 +39,7 @@ public class FolderSync {
     }
 
     private void upload(Path file) throws IOException {
-        String targetPath = UPLOAD_PATH + file.relativize(localRoot);
+        String targetPath = UPLOAD_PATH + remoteRootPath + "/" + localRoot.relativize(file.toAbsolutePath()).toString();
         URI uploadUri = baseServerUri.resolve(targetPath);
 
         HttpURLConnection connection = (HttpURLConnection) uploadUri.toURL().openConnection();
@@ -59,6 +61,9 @@ public class FolderSync {
 
         if(200 != connection.getResponseCode()) {
             log.error("File upload failed with code {}.", connection.getResponseCode());
+            log.debug("File upload failed: {}.", connection.getResponseMessage());
+        } else {
+            log.info("Uploaded file {}.", file);
         }
     }
 

@@ -21,6 +21,7 @@ public class Main {
         Options options = new Options();
         options.addOption("c", true, "Command to execute.");
         options.addOption("u", true, "Remote endpoint.");
+        options.addOption("p", true, "Remote root path.");
         options.addOption("h", false, "Print this help message.");
 
         CommandLineParser parser = new DefaultParser();
@@ -32,13 +33,14 @@ public class Main {
             return;
         }
 
-        String command = getOption(cmd, "c", "pwd");
+        String command = getOption(cmd, "c", "find .");
         String remoteUri = getOption(cmd, "u", "http://localhost:8080");
+        String remoteRootPath = getOption(cmd, "p", ""); //TODO update build agent to accept relative paths
 
-        URI baseServerUri = new URI(remoteUri);
-//        FolderSync folderSync = new FolderSync(baseServerUri);
+        FolderSync folderSync = new FolderSync(new URI(remoteUri + "/"), remoteRootPath);
+        folderSync.push();
 
-        RemoteTty remoteTty = new RemoteTty(baseServerUri);
+        RemoteTty remoteTty = new RemoteTty(new URI(remoteUri));
         remoteTty.execute(command);
     }
 

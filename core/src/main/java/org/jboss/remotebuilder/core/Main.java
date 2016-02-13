@@ -18,6 +18,22 @@ import java.util.concurrent.TimeoutException;
  */
 public class Main {
     public static void main(String[] args) throws ParseException, InterruptedException, TimeoutException, IOException, URISyntaxException {
+//
+//        int i = 'C' - 64;
+//        System.out.println(i);
+//
+//        byte b =(byte)i;
+//        System.out.println(b);
+//
+//        byte byteValue = ((Integer) i).byteValue();
+//
+//        System.out.println(byteValue);
+//
+//
+//
+//        System.exit(0);
+
+
         Options options = new Options();
         options.addOption("c", true, "Command to execute.");
         options.addOption("u", true, "Remote endpoint.");
@@ -33,12 +49,13 @@ public class Main {
             return;
         }
 
-        String command = getOption(cmd, "c", "find .");
+//        String command = getOption(cmd, "c", "find .");
+        String command = getOption(cmd, "c", "pwd");
         String remoteUri = getOption(cmd, "u", "http://localhost:8080");
         String remoteRootPath = getOption(cmd, "p", ""); //TODO update build agent to accept relative paths
 
-        FolderSync folderSync = new FolderSync(new URI(remoteUri + "/"), remoteRootPath);
-        folderSync.push();
+//        FolderSync folderSync = new FolderSync(new URI(remoteUri + "/"), remoteRootPath);
+//        folderSync.push();
 
         RemoteTty remoteTty = new RemoteTty(new URI(remoteUri));
         remoteTty.execute(command);

@@ -3,7 +3,9 @@ package org.jboss.remoterunner.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +19,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -28,14 +31,43 @@ public class FolderSync {
     private static final String UPLOAD_PATH = "servlet/upload";
     private final URI baseServerUri;
     private final String remoteRootPath;
+    private boolean copyNonUpdated;
     private final Path localRoot = Paths.get(".").toAbsolutePath();
 
     List<String> ignoredPaths = new ArrayList<>();
+    Properties properties;
+    private long lastSync;
 
-    public FolderSync(URI baseServerUri, String remoteRootPath) {
+    public FolderSync(URI baseServerUri, String remoteRootPath, boolean copyNonUpdated) {
         this.baseServerUri = baseServerUri;
         this.remoteRootPath = remoteRootPath;
+        this.copyNonUpdated = copyNonUpdated;
         initializeIgnoredPaths();
+        loadAndUpdateProperties();
+    }
+
+    private void loadAndUpdateProperties() {
+        Properties defaults = new Properties();
+        defaults.put("lastSync", "0");
+
+        properties = new Properties(defaults);
+        File propertiesFile = new File("remote-runner.properties");
+        if (propertiesFile.exists()) {
+            try (InputStream propertiesStream = new FileInputStream(propertiesFile)) {
+                properties.load(propertiesStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        lastSync = Long.parseLong(properties.getProperty("lastSync"));
+        properties.put("lastSync", Long.toString(System.currentTimeMillis()));
+
+        try (OutputStream propertiesStream = new FileOutputStream(propertiesFile)){
+            properties.store(propertiesStream, "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void push() throws IOException {
@@ -44,6 +76,8 @@ public class FolderSync {
     }
 
     private void upload(Path file) throws IOException {
+        log.info("Uploading file {} ...", file);
+
         String targetPath = UPLOAD_PATH + remoteRootPath + "/" + localRoot.relativize(file.toAbsolutePath()).toString();
         URI uploadUri = baseServerUri.resolve(targetPath);
 
@@ -69,7 +103,7 @@ public class FolderSync {
             log.error("File upload failed with code {}.", connection.getResponseCode());
             log.debug("File upload failed: {}.", connection.getResponseMessage());
         } else {
-            log.info("Uploaded file {}.", file);
+            log.debug("File {} uploaded.", file);
         }
     }
 
@@ -79,7 +113,11 @@ public class FolderSync {
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if(!attrs.isDirectory()){
                     if (!isIgnored(file)) {
-                        upload(file);
+                        if (copyNonUpdated || wasUpdated(attrs)) {
+                            upload(file);
+                        } else {
+                            log.debug("Skipping non updated file: {}", file);
+                        }
                     } else {
                         log.debug("Skipping ignored file: {}", file);
                     }
@@ -87,6 +125,10 @@ public class FolderSync {
                 return FileVisitResult.CONTINUE;
             }
         };
+    }
+
+    private boolean wasUpdated(BasicFileAttributes attrs) {
+        return attrs.lastModifiedTime().toMillis() > lastSync;
     }
 
     private void initializeIgnoredPaths() {

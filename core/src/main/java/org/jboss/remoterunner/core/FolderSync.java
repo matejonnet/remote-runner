@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
@@ -28,9 +30,12 @@ public class FolderSync {
     private final String remoteRootPath;
     private final Path localRoot = Paths.get(".").toAbsolutePath();
 
+    List<String> ignoredPaths = new ArrayList<>();
+
     public FolderSync(URI baseServerUri, String remoteRootPath) {
         this.baseServerUri = baseServerUri;
         this.remoteRootPath = remoteRootPath;
+        initializeIgnoredPaths();
     }
 
     public void push() throws IOException {
@@ -52,9 +57,10 @@ public class FolderSync {
 
         try (OutputStream outputStream = connection.getOutputStream()) {
             try (InputStream inputStream = new FileInputStream(file.toFile())) {
-                int fileByte;
-                while ((fileByte = inputStream.read()) != -1) {
-                    outputStream.write(fileByte);
+                byte[] buffer = new byte[512];
+                int length;
+                while ((length = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, length);
                 }
             }
         }
@@ -72,11 +78,27 @@ public class FolderSync {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if(!attrs.isDirectory()){
-                    upload(file);
+                    if (!isIgnored(file)) {
+                        upload(file);
+                    } else {
+                        log.debug("Skipping ignored file: {}", file);
+                    }
                 }
                 return FileVisitResult.CONTINUE;
             }
         };
     }
+
+    private void initializeIgnoredPaths() {
+        ignoredPaths.add(".git/");
+    }
+
+    private boolean isIgnored(Path file) {
+        for (String ignored : ignoredPaths) {
+            return file.normalize().startsWith(ignored);
+        };
+        return false;
+    }
+
 
 }

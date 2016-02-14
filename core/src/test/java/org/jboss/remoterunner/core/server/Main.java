@@ -1,4 +1,4 @@
-package org.jboss.remotebuilder.core.server;
+package org.jboss.remoterunner.core.server;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>

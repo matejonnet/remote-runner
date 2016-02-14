@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jboss.remotebuilder.core.server;
+package org.jboss.remoterunner.core.server;
 
 import org.jboss.pnc.buildagent.BuildAgent;
 import org.slf4j.Logger;

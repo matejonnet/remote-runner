@@ -1,4 +1,4 @@
-package org.jboss.remotebuilder.core;
+package org.jboss.remoterunner.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

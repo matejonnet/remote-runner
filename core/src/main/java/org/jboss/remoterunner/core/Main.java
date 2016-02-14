@@ -1,4 +1,4 @@
-package org.jboss.remotebuilder.core;
+package org.jboss.remoterunner.core;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

@@ -1,4 +1,4 @@
-package org.jboss.remotebuilder.core;
+package org.jboss.remoterunner.core;
 
 import org.jboss.pnc.buildagent.api.TaskStatusUpdateEvent;
 import org.jboss.pnc.buildagent.client.BuildAgentClient;

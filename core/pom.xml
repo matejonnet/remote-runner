@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.jboss.remotebuilder</groupId>
+    <groupId>org.jboss.remoterunner</groupId>
     <artifactId>parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.jboss.remotebuilder</groupId>
+  <groupId>org.jboss.remoterunner</groupId>
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
 
@@ -63,7 +63,7 @@
             <archive>
               <manifest>
                 <addClasspath>true</addClasspath>
-                <mainClass>org.jboss.remotebuilder.core.Main</mainClass>
+                <mainClass>org.jboss.remoterunner.core.Main</mainClass>
                 <classpathPrefix>dependency-jars/</classpathPrefix>
               </manifest>
             </archive>
@@ -77,7 +77,7 @@
             <archive>
               <index>true</index>
               <manifest>
-                <mainClass>org.jboss.remotebuilder.core.Main</mainClass>
+                <mainClass>org.jboss.remoterunner.core.Main</mainClass>
                 <addDefaultSpecificationEntries>
                   true
                 </addDefaultSpecificationEntries>
@@ -135,7 +135,7 @@
                 </goals>
                 <phase>test</phase>
                 <configuration>
-                  <mainClass>org.jboss.remotebuilder.core.Main</mainClass>
+                  <mainClass>org.jboss.remoterunner.core.Main</mainClass>
                 </configuration>
               </execution>
             </executions>

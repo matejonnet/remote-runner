@@ -1,6 +1,6 @@
-package org.jboss.remotebuilder.core;
+package org.jboss.remoterunner.core;
 
-import org.jboss.remotebuilder.core.server.BuildAgentServer;
+import org.jboss.remoterunner.core.server.BuildAgentServer;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

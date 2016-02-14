@@ -35,7 +35,7 @@ public class ExecuteRemoteCommandTest {
     @Test
     public void shouldExecuteRemoteCommandAndPrintTheOutput() throws InterruptedException, TimeoutException, IOException {
         //given
-        RemoteTty remoteTty = new RemoteTty(URI.create("http://localhost:8080"));
+            RemoteTty remoteTty = new RemoteTty(URI.create("http://localhost:8080"));
 
         // Create a stream to hold the output
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
